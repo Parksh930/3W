@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 회원정보 처리 SQL -->
+<mapper namespace="global.sesoc.www.dao.MemberMapper">
+
+	<!-- 회원 정보 저장 -->
+	<insert id="insertMember" parameterType="MemberVO">
+	<!-- MemberMapper.java에 있는 insertMember method / 받아오는 것은 MemberVO 타입-->
+	insert into
+		user_info (email, password)
+		values(
+			#{email}
+			, #{password}
+	)
+	</insert>
+	
+	<!-- 회원정보 수정 -->
+	<update id="update" parameterType="MemberVO">
+	update
+		user_info
+	set
+		username = #{username}
+		, userbirthdate = #{userbirthdate}
+		<if test='password != null and password != ""'>
+		, password = #{password}
+		</if>
+	where
+		email = #{email}
+	</update>
+	
+	<!-- DB에 이미지 저장 -->
+	<update id="insertImage" parameterType="hashmap">
+	update
+		user_info
+	set
+   		savedImage = #{savedImage} 
+	where
+		email = #{email}
+	</update> 	
+		
+	<!-- DB에 저장된 이미지 불러오기 -->	
+	<!-- resultMap 타입 지정 -->
+	<resultMap id="responseMap" type="hashmap">
+	      <result property="blobData" javaType="_byte[]" column="SAVEDIMAGE" jdbcType="BLOB"/>
+	</resultMap>
+
+	<!--DB에서 이미지 가져오기  -->
+	<select id="selectImage" parameterType="string" resultMap="responseMap">
+	select savedImage from user_info where email = #{email} 
+	</select>		
+		
+		
+	<!-- 이메일로 회원 찾기 -->
+	<select id="getMember" parameterType="string" resultType="MemberVO">
+		select email, password, identification, username, userbirthdate, twitterID from user_info where email = #{email}
+	</select>
+		
+</mapper>
